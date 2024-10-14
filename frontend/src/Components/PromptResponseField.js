@@ -6,7 +6,7 @@ const PromptResponseField = ({ responses, rows = 15 }) => (
     variant='outlined'
     multiline
     rows={rows}
-    value={responses}
+    value={responses.join('\n')}
     InputProps={{ readOnly: true }}
     fullWidth
   />
