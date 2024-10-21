@@ -7,7 +7,7 @@ import img_swinburne from '../assets/images/img_swinburne.jpg';
 
 function About() {
   return (
-    <Grid2 container direction="column" spacing={4} justifyContent="center" alignItems="center" sx={{ paddingTop: "8vh" }}>
+    <Grid2 container direction="column" spacing={4} justifyContent="center" alignItems="center" sx={{ paddingTop: "12vh" }}>
       <Grid2 item container direction="row" alignItems="center" justifyContent="space-between" sx={{width:"45%"}}>
       <Typography variant="h7" sx={{ flex: 1, textAlign: "left" }}>
           This is some default text explaining our project
