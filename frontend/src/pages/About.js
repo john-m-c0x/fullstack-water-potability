@@ -1,13 +1,19 @@
 import React from 'react';
-import { Box, Typography } from '@mui/material';
+import { Grid2, Typography } from '@mui/material';
+import AboutCard from '../components/AboutCard';
+
+//import swinLogo from '../assets/images/img_clarity';
 
 function About() {
   return (
-    <Box>
-        <Typography variant="h6" sx={{ marginLeft: 5 }}>
-            About Page Default Text
+    <Grid2 container direction="column" spacing={4} justifyContent="center" alignItems="center" sx={{ paddingTop: "8vh" }}>
+      <Grid2 item direction="row" alignItems="center" justifyContent="space-between" sx={{width:"45%"}}>
+      <Typography variant="h7" sx={{ flex: 1, textAlign: "left" }}>
+          This is some default text explaining our project
         </Typography>
-    </Box>
+        <AboutCard primaryText="Our Project" secondaryText="AQUA.AI" description="Analysing Water" isLinkEnabled={false} sx={{ flex: 1 }}/>
+      </Grid2>
+    </Grid2>
   );
 }
 
