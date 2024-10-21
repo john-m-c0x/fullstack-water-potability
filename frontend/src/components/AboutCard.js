@@ -26,7 +26,7 @@ export default function AboutCard({
                 {image && (
                     <CardMedia
                         component="img"
-                        height="140"
+                        height="120"
                         image={image}
                         alt={primaryText}
                     />
