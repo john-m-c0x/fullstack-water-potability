@@ -9,17 +9,34 @@ function Landing() {
   //The prompt to send to home page, automatically updated via PrompInputFields 'onPromptChange'
   const [prompt, setPrompt] = useState('');
 
+  //Used to indicate the current value the user is typing
+  //TODO: Need to update this with labels relevant to the dataset we are using
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const labels = ['Value1', 'Value2', 'Value3', 'Value4', 'Value5', 'Value6', 'Value7', 'Value8'];
+
   //Send the prompt via state to home page when user taps enter - with key 'passedPrompt' and value 'prompt'
   const passPromptToHome = (event) => {
-    if (event.key === "Enter") {
+    if (event.key === 'Enter') {
       naviagte('/Home', {state: {passedPrompt: prompt}});
     }
   };
 
+  //Handle when the text in the prompt field changes
+  const handlePromptChange = (e) => {
+    //Set the prompt variable with the text in the text field
+    const input = e.target.value;
+    setPrompt(input);
+
+    //Update current index based on the number of space-separated values
+    const values = input.trim().split(' ');
+    const index = Math.min(values.length, labels.length);
+    setCurrentIndex(index);
+  };
+
   return (
-    <Grid2 container spacing={12} direction="column" justifyContent="center" alignItems="center" sx={{height:"60vh"}}>
+    <Grid2 container spacing={12} direction='column' justifyContent='center' alignItems='center' sx={{height:'60vh'}}>
       <Grid2 item xs={12} sx={{ display: 'flex', justifyContent: 'center', width: '100%'}}>
-        <Typography variant="h5">
+        <Typography variant='h5'>
           Transforming data into clarity.
         </Typography>
       </Grid2>
@@ -27,7 +44,9 @@ function Landing() {
         <PromptInputField
           prompt={prompt}
           onKeyDown={passPromptToHome}
-          onPromptChange={(e) => setPrompt(e.target.value)}
+          onPromptChange={handlePromptChange}
+          labels={labels}
+          currentIndex={currentIndex}
         />
       </Grid2>
     </Grid2>

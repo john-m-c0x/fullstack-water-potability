@@ -1,8 +1,8 @@
 import React from 'react';
-import { TextField, CircularProgress, Box } from '@mui/material';
+import { TextField, CircularProgress, Box, Typography } from '@mui/material';
 
 //Text field with exposed parameters, includes circular progress that is enabled when 'loading' is true
-const PromptInputField = ({ prompt, isReadOnly, loading, onPromptChange, onKeyDown }) => (
+const PromptInputField = ({ prompt, isReadOnly, loading, onPromptChange, onKeyDown, labels, currentIndex }) => (
   <Box sx={{ position: 'relative' }}>
     <TextField
       variant="outlined"
@@ -20,10 +20,25 @@ const PromptInputField = ({ prompt, isReadOnly, loading, onPromptChange, onKeyDo
           position: 'absolute',
           top: '50%',
           right: 8,
-          marginTop: '-12px',
+          marginTop: '-24px',
         }}
       />
     )}
+    <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: 1 }}>
+      {labels.map((label, index) => (
+        <Typography
+          key={label}
+          variant="body2"
+          sx={{
+            color: index < currentIndex ? 'green' : 'grey',
+            marginRight: 2,
+            fontWeight: index === currentIndex ? 'bold' : 'normal',
+          }}
+        >
+        {label}
+        </Typography>
+      ))}
+    </Box>
   </Box>
 );
 

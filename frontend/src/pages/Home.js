@@ -20,6 +20,11 @@ function Home() {
   //Holds an array of responses from the AI to display in prompt response field
   const [responses, setResponses] = useState([]);
 
+  //Used to indicate the current value the user is typing
+  //TODO: Need to update this with labels relevant to the dataset we are using
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const labels = ['Value1', 'Value2', 'Value3', 'Value4', 'Value5', 'Value6', 'Value7', 'Value8'];
+
   //Barebones implementation for handling a prompt, at the moment this just simulates a call to API - to test UI
   const handlePrompt = () => {
     if (prompt !== '' && !loading)
@@ -32,6 +37,7 @@ function Home() {
         setIsReadOnly(false);
         setLoading(false);
         setPrompt('');
+        setCurrentIndex(0);
       }, 2000);
     }
   }
@@ -46,11 +52,23 @@ function Home() {
 
   //Handles key events
   const keyEvent = (event) => {
-    if (event.key === "Enter")
+    if (event.key === 'Enter')
     {
       handlePrompt();
     }
   }
+
+  //Handle when the text in the prompt field changes
+  const handlePromptChange = (e) => {
+    //Set the prompt variable with the text in the text field
+    const input = e.target.value;
+    setPrompt(input);
+
+    //Update current index based on the number of space-separated values
+    const values = input.trim().split(' ');
+    const index = Math.min(values.length, labels.length);
+    setCurrentIndex(index);
+  };
 
   return (
     <Grid2 container spacing={2} sx={{ flexDirection:'column', height: '75vh', padding: 2, justifyContent: 'center', alignItems: 'center' }}>
@@ -63,9 +81,11 @@ function Home() {
         <PromptInputField
           prompt={prompt}
           onKeyDown={keyEvent}
-          onPromptChange={(e) => setPrompt(e.target.value)}
+          onPromptChange={handlePromptChange}
           loading={loading}
           isReadOnly={isReadOnly}
+          labels={labels}
+          currentIndex={currentIndex}
         />
       </Grid2>
     </Grid2>
