@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import { Grid2 } from '@mui/material';
 import PromptInputField from '../components/PromptInputField';
@@ -25,6 +26,32 @@ function Home() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const labels = ['Value1', 'Value2', 'Value3', 'Value4', 'Value5', 'Value6', 'Value7', 'Value8'];
 
+  //Make a call to the back-end to get a response from the model
+  const handleSubmit = async (e) => {
+    setLoading(true);
+    try {
+    const features = prompt.trim().split(' ').map(Number);
+    //Check if the amount of inputted values is the currect amount, and no non-numerical characters have been entered
+    if (features.length !== 8 || features.some(isNaN)) {
+      setResponses((prev) => [...prev, 'Error: Please enter exactly 8 numerical values']);
+      setLoading(false);
+      return;
+    }
+    //Axios call
+    //Using a post here and sending all data as a map but this can be changed based on how the back-end is structured
+    //Will need to cooridinate on this!
+    const response = await axios.post(`http://localhost:8000/predict`, {features});
+    setResponses(prevResponses => [...prevResponses, `Result: "${response.data.potability}"`]);
+
+    } catch (err) {
+      setResponses(prevResponses => [...prevResponses, `Error: "${err}"`])
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  //DEPRECIATED: (use handleSubmit instead)... But keeping it here just in case UI still has to be tested.
   //Barebones implementation for handling a prompt, at the moment this just simulates a call to API - to test UI
   const handlePrompt = () => {
     if (prompt !== '' && !loading)
@@ -46,7 +73,7 @@ function Home() {
   //Definitely could be a better implementation of this, useEffect was causing me problems, responses were firing twice
   const [firstRun, setFirstRun] = useState(true);
   if (passedPrompt && firstRun) {
-    handlePrompt();
+    handleSubmit();
     setFirstRun(false);
   }
 
@@ -54,7 +81,7 @@ function Home() {
   const keyEvent = (event) => {
     if (event.key === 'Enter')
     {
-      handlePrompt();
+      handleSubmit();
     }
   }
 
