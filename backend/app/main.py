@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import joblib
 import numpy as np
@@ -6,8 +7,18 @@ import numpy as np
 # Initialize FastAPI
 app = FastAPI()
 
+# Enable CORS for your frontend's origin
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # Change this if your frontend runs on a different port
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all methods
+    allow_headers=["*"],  # Allow all headers
+)
+
 # Load the saved model using joblib
 model = joblib.load("trained_svm_model.pkl")
+scaler = joblib.load('scaler.pkl')
 
 # Define the input data structure
 class WaterData(BaseModel):
@@ -36,8 +47,11 @@ async def predict_potability(data: WaterData):
             data.input8,
         ]).reshape(1, -1)  # Reshape to 2D array for a single prediction
 
+        # Preprocess the entered data
+        data_scaled = scaler.transform(input_data)
+
         # Make a prediction
-        prediction = model.predict(input_data)
+        prediction = model.predict(data_scaled)
 
         # Map the model output to a human-readable format
         is_potable = bool(prediction[0])  # Assuming 1 = potable, 0 = non-potable
