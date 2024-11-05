@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import { Grid2 } from '@mui/material';
 import PromptInputField from '../components/PromptInputField';
 import PromptResponseField from '../components/PromptResponseField';
+import { getPrediction } from '../services/api'; // import the API call function
 
 function Home() {
   const location = useLocation();
@@ -24,27 +24,31 @@ function Home() {
   //Used to indicate the current value the user is typing
   //TODO: Need to update this with labels relevant to the dataset we are using
   const [currentIndex, setCurrentIndex] = useState(0);
-  const labels = ['Value1', 'Value2', 'Value3', 'Value4', 'Value5', 'Value6', 'Value7', 'Value8'];
+  const labels = ['pH', 'Hardness', 'Solids', 'Chloramines', 'Sulfate', 'Conductivity', 'Organic Carbon', 'Trihalomethanes', 'Turbidity'];
 
   //Make a call to the back-end to get a response from the model
   const handleSubmit = async (e) => {
     setLoading(true);
     try {
-    const features = prompt.trim().split(' ').map(Number);
-    //Check if the amount of inputted values is the currect amount, and no non-numerical characters have been entered
-    if (features.length !== 8 || features.some(isNaN)) {
-      setResponses((prev) => [...prev, 'Error: Please enter exactly 8 numerical values']);
-      setLoading(false);
-      return;
-    }
-    //Axios call
-    //Using a post here and sending all data as a map but this can be changed based on how the back-end is structured
-    //Will need to cooridinate on this!
-    const response = await axios.post(`http://localhost:8000/predict`, {features});
-    setResponses(prevResponses => [...prevResponses, `Result: "${response.data.potability}"`]);
+      const features = prompt.trim().split(' ').map(parseFloat);
+      console.log(features, features.length);
+      //Check if the amount of inputted values is the currect amount, and no non-numerical characters have been entered
+      if (features.length !== 9 || features.some(isNaN)) {
+        setResponses((prev) => [...prev, 'Error: Please enter exactly 9 numerical values']);
+        setLoading(false);
+        return;
+      }
+
+      // Multiply the last two features before sending to the backend
+      const compositeFeature = features[7] * features[8]; // Multiplying Turbidity and Trihalomethanes
+      const inputData = [...features.slice(0, 7), compositeFeature]; // Prepare data with composite feature
+      
+      const response = await getPrediction(inputData);
+      const potableText = response.potability ? 'This water is potable' : 'This water is not potable';
+      setResponses(prevResponses => [...prevResponses, `Result: ${potableText}`]);
 
     } catch (err) {
-      setResponses(prevResponses => [...prevResponses, `Error: "${err}"`])
+      setResponses(prevResponses => [...prevResponses, `Error: ${err}`])
       console.error(err);
     } finally {
       setLoading(false);
