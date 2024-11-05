@@ -1,122 +1,49 @@
 import React, { useState } from 'react';
-import axios from 'axios';
-import { useLocation } from 'react-router-dom';
-import { Grid2 } from '@mui/material';
-import PromptInputField from '../components/PromptInputField';
-import PromptResponseField from '../components/PromptResponseField';
+import { getPrediction } from '../api'; // import the API call function
 
-function Home() {
-  const location = useLocation();
+const Home = () => {
+    const [features, setFeatures] = useState(Array(8).fill(0)); // Initialize 8 inputs
+    const [prediction, setPrediction] = useState(null);
+    const [error, setError] = useState(null);
 
-  //Sets passedPrompt to value sent from landing page, or '' if sate is null
-  const {passedPrompt} = location.state || '';
+    const handleInputChange = (index, value) => {
+        const newFeatures = [...features];
+        newFeatures[index] = parseFloat(value); // Convert input to a float
+        setFeatures(newFeatures);
+    };
 
-  //The current text inputted into the input text field, set initally based on passedPrompt
-  const [prompt, setPrompt] = useState(passedPrompt || '')
+    const handleSubmit = async (event) => {
+        event.preventDefault(); // Prevent default form submission behavior
+        setError(null);
+        try {
+            const response = await getPrediction(features);
+            // Access the potability key from the response
+            setPrediction(response.potability); // Change this line to match the backend response structure
+        } catch (err) {
+            setError(err.message);
+        }
+    };
 
-  //Properties for the prompt input text field
-  const [isReadOnly, setIsReadOnly] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  //Holds an array of responses from the AI to display in prompt response field
-  const [responses, setResponses] = useState([]);
-
-  //Used to indicate the current value the user is typing
-  //TODO: Need to update this with labels relevant to the dataset we are using
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const labels = ['Value1', 'Value2', 'Value3', 'Value4', 'Value5', 'Value6', 'Value7', 'Value8'];
-
-  //Make a call to the back-end to get a response from the model
-  const handleSubmit = async (e) => {
-    setLoading(true);
-    try {
-    const features = prompt.trim().split(' ').map(Number);
-    //Check if the amount of inputted values is the currect amount, and no non-numerical characters have been entered
-    if (features.length !== 8 || features.some(isNaN)) {
-      setResponses((prev) => [...prev, 'Error: Please enter exactly 8 numerical values']);
-      setLoading(false);
-      return;
-    }
-    //Axios call
-    //Using a post here and sending all data as a map but this can be changed based on how the back-end is structured
-    //Will need to cooridinate on this!
-    const response = await axios.post(`http://localhost:8000/predict`, {features});
-    setResponses(prevResponses => [...prevResponses, `Result: "${response.data.potability}"`]);
-
-    } catch (err) {
-      setResponses(prevResponses => [...prevResponses, `Error: "${err}"`])
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  //DEPRECIATED: (use handleSubmit instead)... But keeping it here just in case UI still has to be tested.
-  //Barebones implementation for handling a prompt, at the moment this just simulates a call to API - to test UI
-  const handlePrompt = () => {
-    if (prompt !== '' && !loading)
-    {
-      setIsReadOnly(true)
-      setLoading(true)
-
-      setTimeout(() => {
-        setResponses(prevResponses => [...prevResponses, `Response for: '${prompt}'`])
-        setIsReadOnly(false);
-        setLoading(false);
-        setPrompt('');
-        setCurrentIndex(0);
-      }, 2000);
-    }
-  }
-
-  //Calls handlePrompt on first run if a prompt has been passed from landing page
-  //Definitely could be a better implementation of this, useEffect was causing me problems, responses were firing twice
-  const [firstRun, setFirstRun] = useState(true);
-  if (passedPrompt && firstRun) {
-    handleSubmit();
-    setFirstRun(false);
-  }
-
-  //Handles key events
-  const keyEvent = (event) => {
-    if (event.key === 'Enter')
-    {
-      handleSubmit();
-    }
-  }
-
-  //Handle when the text in the prompt field changes
-  const handlePromptChange = (e) => {
-    //Set the prompt variable with the text in the text field
-    const input = e.target.value;
-    setPrompt(input);
-
-    //Update current index based on the number of space-separated values
-    const values = input.trim().split(' ');
-    const index = Math.min(values.length, labels.length);
-    setCurrentIndex(index);
-  };
-
-  return (
-    <Grid2 container spacing={2} sx={{ flexDirection:'column', height: '75vh', padding: 2, justifyContent: 'center', alignItems: 'center' }}>
-      <Grid2 item xs={12} sx={{width:{xs: '90%', sm: '70%', md: '60%', lg: '40%'}}}>
-        <PromptResponseField
-          responses={responses}
-        />
-      </Grid2>
-      <Grid2 item xs={12} sx={{width:{xs: '90%', sm: '70%', md: '60%', lg: '40%'}}}>
-        <PromptInputField
-          prompt={prompt}
-          onKeyDown={keyEvent}
-          onPromptChange={handlePromptChange}
-          loading={loading}
-          isReadOnly={isReadOnly}
-          labels={labels}
-          currentIndex={currentIndex}
-        />
-      </Grid2>
-    </Grid2>
-  );
-}
+    return (
+        <div>
+            <h2>Predictor</h2>
+            <form onSubmit={handleSubmit}>
+                {features.map((feature, index) => (
+                    <input
+                        key={index}
+                        type="number"
+                        step="0.01"
+                        value={feature}
+                        onChange={(e) => handleInputChange(index, e.target.value)}
+                        placeholder={`Input ${index + 1}`}
+                    />
+                ))}
+                <button type="submit">Get Prediction</button>
+            </form>
+            {prediction !== null && <p>Prediction: {prediction ? 'Potable' : 'Not Potable'}</p>}
+            {error && <p style={{ color: 'red' }}>Error: {error}</p>}
+        </div>
+    );
+};
 
 export default Home;
