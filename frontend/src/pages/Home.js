@@ -73,14 +73,6 @@ function Home() {
     }
   }
 
-  //Calls handlePrompt on first run if a prompt has been passed from landing page
-  //Definitely could be a better implementation of this, useEffect was causing me problems, responses were firing twice
-  const [firstRun, setFirstRun] = useState(true);
-  if (passedPrompt && firstRun) {
-    handleSubmit();
-    setFirstRun(false);
-  }
-
   //Handles key events
   const keyEvent = (event) => {
     if (event.key === 'Enter')
@@ -100,6 +92,15 @@ function Home() {
     const index = Math.min(values.length, labels.length);
     setCurrentIndex(index);
   };
+
+  //Calls handlePrompt on first run if a prompt has been passed from landing page
+  //Definitely could be a better implementation of this, useEffect was causing me problems, responses were firing twice
+  const [firstRun, setFirstRun] = useState(true);
+  if (passedPrompt && firstRun) {
+    handlePromptChange({ target: { value: passedPrompt } });
+    handleSubmit();
+    setFirstRun(false);
+  }
 
   return (
     <Grid2 container spacing={2} sx={{ flexDirection:'column', height: '75vh', padding: 2, justifyContent: 'center', alignItems: 'center' }}>
