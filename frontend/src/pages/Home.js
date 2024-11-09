@@ -4,6 +4,7 @@ import { Grid2 } from '@mui/material';
 import PromptInputField from '../components/PromptInputField';
 import PromptResponseField from '../components/PromptResponseField';
 import { getPrediction } from '../services/api'; // import the API call function
+import WaterQualityChart from '../components/WaterQualityChart';
 
 function Home() {
   const location = useLocation();
@@ -26,30 +27,40 @@ function Home() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const labels = ['pH', 'Hardness', 'Solids', 'Chloramines', 'Sulfate', 'Conductivity', 'Organic Carbon', 'Trihalomethanes', 'Turbidity'];
 
+  // Add this new state variable with the other state declarations
+  const [chartFeatures, setChartFeatures] = useState(Array(9).fill(0));
+
   //Make a call to the back-end to get a response from the model
   const handleSubmit = async (e) => {
     setLoading(true);
     try {
       const features = prompt.trim().split(' ').map(parseFloat);
-      console.log(features, features.length);
-      //Check if the amount of inputted values is the currect amount, and no non-numerical characters have been entered
+      console.log("Features being sent:", features, features.length);  // Debug log
+      
       if (features.length !== 9 || features.some(isNaN)) {
         setResponses((prev) => [...prev, 'Error: Please enter exactly 9 numerical values']);
         setLoading(false);
         return;
       }
 
+      // Update chart features
+      setChartFeatures(features);
+
       // Multiply the last two features before sending to the backend
       const compositeFeature = features[7] * features[8]; // Multiplying Turbidity and Trihalomethanes
       const inputData = [...features.slice(0, 7), compositeFeature]; // Prepare data with composite feature
       
+      console.log("Data being sent to backend:", inputData);  // Debug log
+      
       const response = await getPrediction(inputData);
+      console.log("Response from backend:", response);  // Debug log
+      
       const potableText = response.potability ? 'This water is potable' : 'This water is not potable';
       setResponses(prevResponses => [...prevResponses, `Result: ${potableText}`]);
 
     } catch (err) {
-      setResponses(prevResponses => [...prevResponses, `Error: ${err}`])
-      console.error(err);
+      console.error("Detailed error:", err);  // More detailed error logging
+      setResponses(prevResponses => [...prevResponses, `Error: ${err.message || err}`])
     } finally {
       setLoading(false);
     }
@@ -102,8 +113,30 @@ function Home() {
     setFirstRun(false);
   }
 
+  // Function to generate random numbers within specific ranges for each parameter, 
+  // used to test the UI without having to enter custom values, hopefully helpful for marking
+  
+  const generateTestData = () => {
+    const randomData = [
+      (Math.random() * (14 - 0) + 0).toFixed(2),     // pH: 0-14
+      (Math.random() * (300 - 0) + 0).toFixed(2),    // Hardness: 0-300
+      (Math.random() * (1000 - 0) + 0).toFixed(2),  // Solids: 0-50000
+      (Math.random() * (10 - 0) + 0).toFixed(2),     // Chloramines: 0-10
+      (Math.random() * (500 - 0) + 0).toFixed(2),    // Sulfate: 0-500
+      (Math.random() * (800 - 0) + 0).toFixed(2),    // Conductivity: 0-800
+      (Math.random() * (20 - 0) + 0).toFixed(2),     // Organic Carbon: 0-20
+      (Math.random() * (100 - 0) + 0).toFixed(2),    // Trihalomethanes: 0-100
+      (Math.random() * (5 - 0) + 0).toFixed(2)       // Turbidity: 0-5
+    ];
+
+    // Update the prompt with the generated values
+    setPrompt(randomData.join(' '));
+    // Trigger the submit to update the chart and get prediction
+    handleSubmit();
+  };
+
   return (
-    <Grid2 container spacing={2} sx={{ flexDirection:'column', height: '75vh', padding: 2, justifyContent: 'center', alignItems: 'center' }}>
+    <Grid2 container spacing={2} sx={{ flexDirection:'column', height: 'auto', padding: 2, justifyContent: 'center', alignItems: 'center' }}>
       <Grid2 item xs={12} sx={{width:{xs: '90%', sm: '70%', md: '60%', lg: '40%'}}}>
         <PromptResponseField
           responses={responses}
@@ -119,6 +152,26 @@ function Home() {
           labels={labels}
           currentIndex={currentIndex}
         />
+      </Grid2>
+      {/* Add Test Button */}
+      <Grid2 item xs={12} sx={{width:{xs: '90%', sm: '70%', md: '60%', lg: '40%'}, marginTop: 2}}>
+        <button 
+          onClick={generateTestData}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#4CAF50',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            width: '100%'
+          }}
+        >
+          Generate Test Data
+        </button>
+      </Grid2>
+      <Grid2 item xs={12} sx={{width:{xs: '90%', sm: '70%', md: '60%', lg: '40%'}, marginTop: 4}}>
+        <WaterQualityChart features={chartFeatures} />
       </Grid2>
     </Grid2>
   );
