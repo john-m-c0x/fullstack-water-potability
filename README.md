@@ -11,32 +11,44 @@ The Water Potability project focuses on identifying whether a water sample is po
 
 ### Prerequisites
 - Ensure you have **Node.js** installed on your system. You can download it from [Node.js](https://nodejs.org/).
+- Ensure you have **Python** installed on your system. You can download it from [Python](https://www.python.org/).
 
 ### Steps to Install Dependencies
 
 1. Clone this repository:
 
     ```bash
-    git clone https://github.com/yourusername/water-potability.git
+    git clone https://github.com/john-m-c0x/fullstack-water-potability.git
     ```
 
-2. Navigate to the project directory:
+2. Set up the frontend and run the react app:
 
     ```bash
-    cd fulltack-water-potability
-    ```
-
-3. Install the necessary Node and React dependencies (node_modules):
-
-    ```bash
+    cd fullstack-water-potability/frontend
     npm install
+    npm start
     ```
 
-This will install all required packages listed in `package.json`.
+3. Set up the backend, install dependencies, start the virtual environment and run the server:
+
+    ```bash
+    cd ../backend
+    pip install -r app/requirements.txt
+
+    # Start the virtual environment
+    python -m venv venv
+    
+    # On Windows
+    .\venv\Scripts\activate
+    
+    # On Unix or MacOS
+    source venv/bin/activate
+    
+    # Run the server
+    uvicorn app.main:app --reload --port 5000
+    ```
 
 ## Usage
 
-To run the project after installing the dependencies, you can cd into the project directory start the application using:
+To run the project, you'll need to start both the frontend and backend servers, and interact with the App through the frontend.
 
-```bash
-npm start
