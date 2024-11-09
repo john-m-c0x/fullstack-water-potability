@@ -1,22 +1,24 @@
 import axios from 'axios';
 
-export const getPrediction = async (features) => {
-    try {
-        const inputData = {
-            input1: features[0],
-            input2: features[1],
-            input3: features[2],
-            input4: features[3],
-            input5: features[4],
-            input6: features[5],
-            input7: features[6],
-            input8: features[7],
-        };
+const API_URL = 'http://localhost:5000';
 
-        const response = await axios.post('http://localhost:8000/predict', inputData);
-        return response.data;
-    } catch (error) {
-        console.error('Error in getPrediction:', error.response ? error.response.data : error.message);
-        throw new Error('Failed to get prediction');
-    }
+export const getPrediction = async (features) => {
+  try {
+    console.log('Sending features to backend:', features);
+    
+    const response = await axios.post(`${API_URL}/predict`, {
+      features: features
+    });
+    
+    console.log('Response from backend:', response.data);
+    return response.data;
+    
+  } catch (error) {
+    console.error('API Error:', {
+      message: error.message,
+      response: error.response?.data,
+      status: error.response?.status
+    });
+    throw new Error(error.response?.data?.detail || error.message);
+  }
 };
