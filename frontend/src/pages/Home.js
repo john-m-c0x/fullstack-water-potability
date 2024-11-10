@@ -5,6 +5,8 @@ import PromptInputField from '../components/PromptInputField';
 import PromptResponseField from '../components/PromptResponseField';
 import { getPrediction } from '../services/api'; // import the API call function
 import WaterQualityChart from '../components/WaterQualityChart';
+import { motion } from 'framer-motion';
+import TestDataButton from '../components/TestDataButton';
 
 function Home() {
   const location = useLocation();
@@ -113,67 +115,82 @@ function Home() {
     setFirstRun(false);
   }
 
-  // Function to generate random numbers within specific ranges for each parameter, 
-  // used to test the UI without having to enter custom values, hopefully helpful for marking
-  
-  const generateTestData = () => {
-    const randomData = [
-      (Math.random() * (14 - 0) + 0).toFixed(2),     // pH: 0-14
-      (Math.random() * (300 - 0) + 0).toFixed(2),    // Hardness: 0-300
-      (Math.random() * (1000 - 0) + 0).toFixed(2),  // Solids: 0-50000
-      (Math.random() * (10 - 0) + 0).toFixed(2),     // Chloramines: 0-10
-      (Math.random() * (500 - 0) + 0).toFixed(2),    // Sulfate: 0-500
-      (Math.random() * (800 - 0) + 0).toFixed(2),    // Conductivity: 0-800
-      (Math.random() * (20 - 0) + 0).toFixed(2),     // Organic Carbon: 0-20
-      (Math.random() * (100 - 0) + 0).toFixed(2),    // Trihalomethanes: 0-100
-      (Math.random() * (5 - 0) + 0).toFixed(2)       // Turbidity: 0-5
-    ];
-
-    // Update the prompt with the generated values
-    setPrompt(randomData.join(' '));
-    // Trigger the submit to update the chart and get prediction
+  const handleTestDataGenerated = (data) => {
+    setPrompt(data);
     handleSubmit();
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+        ease: "easeOut"
+      }
+    }
+  };
+
   return (
-    <Grid2 container spacing={2} sx={{ flexDirection:'column', height: 'auto', padding: 2, justifyContent: 'center', alignItems: 'center' }}>
-      <Grid2 item xs={12} sx={{width:{xs: '90%', sm: '70%', md: '60%', lg: '40%'}}}>
-        <PromptResponseField
-          responses={responses}
-        />
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        width: '100%',
+        padding: '2rem'
+      }}
+    >
+      <Grid2 
+        container 
+        direction="column" 
+        alignItems="center" 
+        spacing={2}
+        sx={{ 
+          maxWidth: {xs: '90%', sm: '70%', md: '60%', lg: '40%'},
+        }}
+      >
+        <Grid2 item xs={12} sx={{ width: '100%' }}>
+          <PromptResponseField
+            responses={responses}
+          />
+        </Grid2>
+        
+        <Grid2 item xs={12} sx={{ width: '100%' }}>
+          <PromptInputField
+            prompt={prompt}
+            onKeyDown={keyEvent}
+            onPromptChange={handlePromptChange}
+            loading={loading}
+            isReadOnly={isReadOnly}
+            labels={labels}
+            currentIndex={currentIndex}
+          />
+        </Grid2>
+        
+        <Grid2 item xs={12} sx={{ width: '100%', marginTop: 2 }}>
+          <TestDataButton onDataGenerated={handleTestDataGenerated} />
+        </Grid2>
+        
+        <Grid2 item xs={12} sx={{ width: '100%', marginTop: 4 }}>
+          <WaterQualityChart features={chartFeatures} />
+        </Grid2>
       </Grid2>
-      <Grid2 item xs={12} sx={{width:{xs: '90%', sm: '70%', md: '60%', lg: '40%'}}}>
-        <PromptInputField
-          prompt={prompt}
-          onKeyDown={keyEvent}
-          onPromptChange={handlePromptChange}
-          loading={loading}
-          isReadOnly={isReadOnly}
-          labels={labels}
-          currentIndex={currentIndex}
-        />
-      </Grid2>
-      {/* Add Test Button */}
-      <Grid2 item xs={12} sx={{width:{xs: '90%', sm: '70%', md: '60%', lg: '40%'}, marginTop: 2}}>
-        <button 
-          onClick={generateTestData}
-          style={{
-            padding: '10px 20px',
-            backgroundColor: '#4CAF50',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            width: '100%'
-          }}
-        >
-          Generate Test Data
-        </button>
-      </Grid2>
-      <Grid2 item xs={12} sx={{width:{xs: '90%', sm: '70%', md: '60%', lg: '40%'}, marginTop: 4}}>
-        <WaterQualityChart features={chartFeatures} />
-      </Grid2>
-    </Grid2>
+    </motion.div>
   );
 }
 

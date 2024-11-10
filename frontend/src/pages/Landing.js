@@ -1,10 +1,11 @@
 import React, {useState} from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Grid2, Typography } from '@mui/material';
+import { Grid2, Typography, Fade, Paper } from '@mui/material';
 import PromptInputField from '../components/PromptInputField';
 
 function Landing() {
-  const naviagte = useNavigate();
+  const navigate = useNavigate();
+  const [isExiting, setIsExiting] = useState(false);
 
   //The prompt to send to home page, automatically updated via PrompInputFields 'onPromptChange'
   const [prompt, setPrompt] = useState('');
@@ -12,12 +13,15 @@ function Landing() {
   //Used to indicate the current value the user is typing
   //TODO: Need to update this with labels relevant to the dataset we are using
   const [currentIndex, setCurrentIndex] = useState(0);
-  const labels = ['Value1', 'Value2', 'Value3', 'Value4', 'Value5', 'Value6', 'Value7', 'Value8'];
+  const labels = ['pH', 'Hardness', 'Solids', 'Chloramines', 'Sulfate', 'Conductivity', 'Organic Carbon', 'Trihalomethanes', 'Turbidity'];
 
   //Send the prompt via state to home page when user taps enter - with key 'passedPrompt' and value 'prompt'
   const passPromptToHome = (event) => {
     if (event.key === 'Enter') {
-      naviagte('/Home', {state: {passedPrompt: prompt}});
+      setIsExiting(true);
+      setTimeout(() => {
+        navigate('/', {state: {passedPrompt: prompt}});
+      }, 400); // Delay navigation to allow fade effect
     }
   };
 
@@ -34,22 +38,27 @@ function Landing() {
   };
 
   return (
-    <Grid2 container spacing={12} direction='column' justifyContent='center' alignItems='center' sx={{height:'60vh'}}>
-      <Grid2 item xs={12} sx={{ display: 'flex', justifyContent: 'center', width: '100%'}}>
-        <Typography variant='h5'>
-          Transforming data into clarity.
-        </Typography>
+    <Fade in={!isExiting} timeout={400}>
+      <Grid2 container spacing={4} direction='column' justifyContent='center' alignItems='center' sx={{height:'80vh'}}>
+        <Grid2 item xs={12} sx={{ textAlign: 'center' }}>
+          <Typography variant='h4' sx={{ marginBottom: 2 }}>
+            Water Quality Analyzer
+          </Typography>
+          <Typography variant='h5' sx={{ marginBottom: 3, color: 'text.secondary' }}>
+            Transforming data into clarity.
+          </Typography>
+        </Grid2>
+        <Grid2 item xs={12} sx={{width:{xs: '90%', sm: '70%', md: '50%', lg: '40%'}}}>
+          <PromptInputField
+            prompt={prompt}
+            onKeyDown={passPromptToHome}
+            onPromptChange={handlePromptChange}
+            labels={labels}
+            currentIndex={currentIndex}
+          />
+        </Grid2>
       </Grid2>
-      <Grid2 item xs={12} sx={{width:{xs: '90%', sm: '70%', md: '50%', lg: '40%'}}}>
-        <PromptInputField
-          prompt={prompt}
-          onKeyDown={passPromptToHome}
-          onPromptChange={handlePromptChange}
-          labels={labels}
-          currentIndex={currentIndex}
-        />
-      </Grid2>
-    </Grid2>
+    </Fade>
   );
 }
 

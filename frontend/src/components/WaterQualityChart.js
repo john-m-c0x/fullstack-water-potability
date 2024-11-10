@@ -10,6 +10,7 @@ import {
   Tooltip,
   Legend
 } from 'chart.js';
+import { motion } from 'framer-motion';
 
 //ChartJS.register used to init relevant chart elements
 ChartJS.register(
@@ -34,8 +35,20 @@ function WaterQualityChart({ features }) {
     // rest of features are scaled as below, these values were found by trial and error
     // found from the sample data used in previous assignments 
     'Hardness': (value) => Math.min((value / 400) * 0.7 + 0.3, 1),
-    'Solids': (value) => Math.min((value / 2000) * 0.7 + 0.3, 1),
-    'Chloramines': (value) => Math.min((value / 6) * 0.7 + 0.3, 1),
+    'Solids': (value) => {
+      // Old scaling: Math.min((value / 2000) * 0.7 + 0.3, 1)
+      // New scaling: normalize between 5000-45000 range
+      const min = 5000;  // approximate minimum
+      const max = 45000; // approximate maximum
+      const normalized = (value - min) / (max - min);
+      return Math.min(Math.max(normalized * 0.7 + 0.3, 0), 1);
+    },
+    'Chloramines': (value) => {
+      const min = 4.0;   // approximate minimum from data
+      const max = 10.0;  // approximate maximum from data
+      const normalized = (value - min) / (max - min);
+      return Math.min(Math.max(normalized * 0.7 + 0.3, 0), 1);
+    },
     'Sulfate': (value) => Math.min((value / 400) * 0.7 + 0.3, 1),
     'Conductivity': (value) => Math.min((value / 1500) * 0.7 + 0.3, 1),
     'Organic Carbon': (value) => Math.min((value / 15) * 0.7 + 0.3, 1),
@@ -166,7 +179,13 @@ function WaterQualityChart({ features }) {
   };
 
   return (
-    <Radar options={options} data={data} />
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+    >
+      <Radar options={options} data={data} />
+    </motion.div>
   );
 }
 
