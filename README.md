@@ -39,7 +39,9 @@ The Water Potability project focuses on identifying whether a water sample is po
     python -m venv venv
     
     # On Windows
+    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
     .\venv\Scripts\activate
+    Set-ExecutionPolicy -ExecutionPolicy Restricted -Scope CurrentUser
     
     # On Unix or MacOS
     source venv/bin/activate
