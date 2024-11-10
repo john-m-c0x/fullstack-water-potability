@@ -6,7 +6,8 @@ const PromptInputField = ({ prompt, isReadOnly, loading, onPromptChange, onKeyDo
   <Box sx={{ position: 'relative' }}>
     <TextField
       variant="outlined"
-      label="Prompt"
+      label="Analyze Water Potability"
+      placeholder="Enter 'Analyze the potability of water based on 9 features' and press Enter"
       value={prompt}
       onKeyDown={onKeyDown}
       onChange={onPromptChange}
