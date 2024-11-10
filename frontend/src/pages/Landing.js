@@ -42,7 +42,7 @@ function Landing() {
       <Grid2 container spacing={4} direction='column' justifyContent='center' alignItems='center' sx={{height:'80vh'}}>
         <Grid2 item xs={12} sx={{ textAlign: 'center' }}>
           <Typography variant='h4' sx={{ marginBottom: 2 }}>
-            Water Quality Analyzer
+            AI Potability Predictor
           </Typography>
           <Typography variant='h5' sx={{ marginBottom: 3, color: 'text.secondary' }}>
             Transforming data into clarity.
