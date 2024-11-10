@@ -20,7 +20,7 @@ function Landing() {
     if (event.key === 'Enter') {
       setIsExiting(true);
       setTimeout(() => {
-        navigate('/', {state: {passedPrompt: prompt}});
+        navigate('/home', {state: {passedPrompt: prompt}});
       }, 400); // Delay navigation to allow fade effect
     }
   };
