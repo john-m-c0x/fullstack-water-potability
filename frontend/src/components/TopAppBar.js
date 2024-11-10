@@ -9,36 +9,31 @@ const TopAppBar = () => {
         <Typography
           variant="h6"
           component={Link}
-          to="/landing"
+          to="/"
           sx={{
+            position: 'absolute',
+            left: 24,
             textDecoration: 'none',
             color: 'inherit',
-            flexGrow: 0
+            textTransform: 'lowercase',
+            '&:hover': {
+              opacity: 0.8
+            }
           }}
         >
-          AQUA.AI
+          aqua.ai
         </Typography>
-        <Box
-          sx={{
-            flexGrow: 1,
-            display: 'flex',
-            justifyContent: 'center',
-            gap: '2rem'
-          }}
-        >
+        <Box sx={{ 
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'center'
+        }}>
           <Button
             color="inherit"
             component={Link}
-            to="/"
+            to="/home"
           >
             Home
-          </Button>
-          <Button
-            color="inherit"
-            component={Link}
-            to="/about"
-          >
-            About
           </Button>
           <Button
             color="inherit"
@@ -47,8 +42,14 @@ const TopAppBar = () => {
           >
             Data
           </Button>
+          <Button
+            color="inherit"
+            component={Link}
+            to="/about"
+          >
+            About
+          </Button>
         </Box>
-        <Box sx={{ flexGrow: 0 }} />
       </Toolbar>
     </AppBar>
   );
