@@ -15,8 +15,8 @@ function App() {
       <TopAppBar />
       <Box component="main" sx={{ flexGrow: 1 }}>
         <Routes>
-          <Route path="/landing" element={<Landing />} />
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Landing />} />
+          <Route path="/home" element={<Home />} />
           <Route path="/data" element={<Data />} />
           <Route path="/about" element={<About />} />
         </Routes>
