@@ -1,7 +1,4 @@
-# Water Potability
-
-This repository contains the code for **Assignment Three** of the COS30049. 
-The objective of this project is to analyze and predict the potability of water based on various chemical properties using machine learning models.
+# Aqua AI - Water Potability Full Stack Application
 
 ## Project Overview
 
